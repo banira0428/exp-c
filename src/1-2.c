@@ -4,8 +4,14 @@
 
 int main(int argc, char *argv[]) {
 
+  // varidate argument
+  if (argc < 2) {
+    printf("argument not found\n");
+    return 1;
+  }
+
   // open file
-  int fd = open("data/1-2", O_RDONLY);
+  int fd = open(argv[1], O_RDONLY);
   if(fd == -1){
     printf("failed to open\n");
     return 1;
