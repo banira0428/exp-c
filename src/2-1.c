@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
   char send_buf[BUF_SIZE] = "GET ";
   strcat(send_buf, argv[2]);
   strcat(send_buf, "\r\n");
-  int send_result = send(soc, send_buf, BUF_SIZE, 0);
+  int send_result = send(soc, send_buf, strlen(send_buf), 0);
   if (send_result == -1) {
     printf("failed to send\n");
     return 1;

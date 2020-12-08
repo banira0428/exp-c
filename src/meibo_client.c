@@ -1,6 +1,7 @@
-#include <stdio.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -12,6 +13,9 @@ int get_line(char *line);
 int get_line_fp(FILE *fp, char *line);
 void parse_line(char *line);
 int subst(char *str, char c1, char c2);
+void cmd_quit();
+void exec_command_str(char *exec[]);
+int split(char *str, char *ret[], char sep, int max);
 int request(char *request, char *response);
 
 int main() {
@@ -47,13 +51,45 @@ int subst(char *str, char c1, char c2) {
   }
 }
 
-void parse_line(char *line)
-{
-  new_profile(line);
+int split(char *str, char *ret[], char sep, int max) {
+  int count = 0;
+  while (1) {
+    ret[count] = str;  //最初に現れた区切り文字以外の文字のアドレスを代入
+    count++;
+    if (count >= max) break;  //分割数の上限に達したら終わり
+    while (*str != sep &&
+           *str) {  //区切り文字か終端記号が現れるまでアドレスを進める
+      str++;
+    }
+    if (*str == '\0') break;  //終端記号なら終わり
+    *str = '\0';              //区切り文字を終端記号に置き換える
+    str++;
+    //ここでインクリメントしてないと，次のループで必ずbreakしてしまう．
+  }
+  return count;
 }
 
-int request(char *request, char *response) {
+void parse_line(char *line) {
+  char *exec[] = {"", "", "", "", ""};
+  split(line + 1, exec, ' ', 5);
+  exec_command_str(exec);
+}
 
+void exec_command_str(char *exec[]) {
+  char *error;
+  int param_num;
+
+  if (!strcmp("Q", exec[0])) {
+    cmd_quit();
+  } else {
+    fprintf(stderr, "Invalid command %s: ignored.\n", exec[0]);
+  }
+  return;
+}
+
+void cmd_quit() { exit(0); }
+
+int request(char *request, char *response) {
   struct hostent *hp;
   hp = gethostbyname("localhost");
 
