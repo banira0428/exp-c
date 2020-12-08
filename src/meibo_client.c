@@ -5,7 +5,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#define PORT_NO 8080
+#define PORT_NO 10428
 #define BUF_SIZE 4096
 #define INPUT_MAX 1024
 
@@ -13,9 +13,10 @@ int get_line(char *line);
 int get_line_fp(FILE *fp, char *line);
 void parse_line(char *line);
 int subst(char *str, char c1, char c2);
-void cmd_quit();
-void exec_command_str(char *exec[]);
 int split(char *str, char *ret[], char sep, int max);
+void cmd_quit();
+void cmd_check();
+void exec_command_str(char *exec[]);
 int request(char *request, char *response);
 
 int main() {
@@ -81,6 +82,8 @@ void exec_command_str(char *exec[]) {
 
   if (!strcmp("Q", exec[0])) {
     cmd_quit();
+  } else if (!strcmp("C", exec[0])) {
+    cmd_check();
   } else {
     fprintf(stderr, "Invalid command %s: ignored.\n", exec[0]);
   }
@@ -88,6 +91,12 @@ void exec_command_str(char *exec[]) {
 }
 
 void cmd_quit() { exit(0); }
+
+void cmd_check() {
+  char response[BUF_SIZE];
+  request("count", response);
+  printf("%s profile(s)\n", response);
+}
 
 int request(char *request, char *response) {
   struct hostent *hp;
@@ -97,10 +106,6 @@ int request(char *request, char *response) {
     printf("host not found\n");
     return -1;
   }
-
-  // get ip address
-  struct in_addr *ip = hp->h_addr_list[0];
-  printf("IP address : %s\n", inet_ntoa(*ip));
 
   // create socket
   int soc = socket(AF_INET, SOCK_STREAM, 0);

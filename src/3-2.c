@@ -64,7 +64,7 @@ int main() {
       send_buf[i] = recv_buf[i] - ('a' - 'A');
     }
 
-    int send_result = send(fd, send_buf, BUF_SIZE, 0);
+    int send_result = send(fd, send_buf, strlen(send_buf), 0);
     if (send_result == -1) {
       printf("failed to send\n");
     }
