@@ -70,9 +70,23 @@ int split(char *str, char *ret[], char sep, int max) {
 }
 
 void parse_line(char *line) {
-  char *exec[] = {"", "", "", "", ""};
-  split(line + 1, exec, ' ', 5);
-  exec_command_str(exec);
+  if (*line == '%') {
+    char *exec[] = {"", "", "", "", ""};
+
+    if (*(line + 1) == 'F')
+    //スペースで区切ってしまうと正常に検索できないので
+    {
+      exec[0] = "F";
+      exec[1] = line + 3;
+    } else {
+      split(line + 1, exec, ' ', 5);
+    }
+    exec_command_str(exec);
+  } else {
+    char response[BUF_SIZE];
+    request(line, response);
+    printf("%s\n", response);
+  }
 }
 
 void exec_command_str(char *exec[]) {
@@ -82,24 +96,58 @@ void exec_command_str(char *exec[]) {
     exit(0);
   } else if (!strcmp("C", exec[0])) {
     char response[BUF_SIZE];
-    request("count", response);
+    request("%C", response);
     printf("%s profile(s)\n", response);
   } else if (!strcmp("P", exec[0])) {
-
     int param_num = strtoi(exec[1], &error);
-        if (*error != '\0')
-        {
-            printf("パラメータは整数にしてください\n");
-            return; //数字が入力されていない場合は処理を中断する
-        }
+    if (*error != '\0') {
+      printf("パラメータは整数にしてください\n");
+      return;  //数字が入力されていない場合は処理を中断する
+    }
 
     char response[BUF_SIZE];
-    request("profile", response);
+    char query[BUF_SIZE] = "%P ";
+    strcat(query,exec[1]);
+    request(query, response);
     printf("%s\n", response);
+  } else if (!strcmp("R", exec[0]) || !strcmp("Read", exec[0])) {
+    cmd_read(exec[1], exec[2]);
   } else {
     fprintf(stderr, "Invalid command %s: ignored.\n", exec[0]);
   }
   return;
+}
+
+void cmd_read(char *param, char *param2)
+{
+    FILE *fp;
+    fp = fopen(param, "r");
+
+    if (fp == NULL)
+    {
+        fprintf(stderr, "Could not open file: %s\n", param);
+        return;
+    }
+
+    char line[INPUT_MAX];
+
+    //読み込み
+
+    while (get_line_fp(fp, line))
+    { /* fp を引数に追加 */
+        parse_line(line);
+    }
+
+    fclose(fp);
+
+    char *error;
+    int param_num = strtoi(param2, &error);
+    if (*error != '\0')
+    {
+        return; //数字が入力されていない場合は処理を中断する
+    }
+
+    return;
 }
 
 int request(char *request, char *response) {
@@ -149,16 +197,13 @@ int request(char *request, char *response) {
   return 0;
 }
 
-int strtoi(char *param, char **error)
-{
-    long l = strtol(param, error, 10);
-    if (l >= __INT_MAX__)
-    {
-        l = __INT_MAX__;
-    }
-    if (l <= -__INT_MAX__)
-    {
-        l = -__INT_MAX__;
-    }
-    return (int)l;
+int strtoi(char *param, char **error) {
+  long l = strtol(param, error, 10);
+  if (l >= __INT_MAX__) {
+    l = __INT_MAX__;
+  }
+  if (l <= -__INT_MAX__) {
+    l = -__INT_MAX__;
+  }
+  return (int)l;
 }

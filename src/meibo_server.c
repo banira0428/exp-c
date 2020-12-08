@@ -10,6 +10,7 @@
 
 #define LIMIT 70
 #define MAX_PROFILES 10000
+#define INPUT_MAX 1024
 
 struct date {
   int y;  // year
@@ -31,9 +32,12 @@ void exec_command_str(char *exec[], char *response);
 void cmd_check(char *response);
 
 int profile_data_nitems = 0; /* 現在のデータ数 */
+struct profile profile_data_store[MAX_PROFILES];
 struct profile *profile_data_store_ptr[MAX_PROFILES];
 
 int main() {
+  make_profile_shadow(profile_data_store, profile_data_store_ptr, MAX_PROFILES);
+
   // create socket
   int soc = socket(AF_INET, SOCK_STREAM, 0);
   if (soc == -1) {
@@ -77,6 +81,8 @@ int main() {
       printf("failed to receive\n");
     }
 
+    printf("%s\n",request);
+
     char response[BUF_SIZE] = "";
     parse_line(request, response);
 
@@ -88,24 +94,100 @@ int main() {
   close(soc);
 }
 
+void make_profile_shadow(struct profile data_store[],
+                         struct profile *shadow[],
+                         int size)
+{
+    int i;
+    for (i = 0; i < size; i++)
+        shadow[i] = &data_store[i];
+}
+
 void parse_line(char *line, char *response) {
-  char *exec[] = {"", "", "", "", ""};
-  split(line, exec, ' ', 5);
-  exec_command_str(exec, response);
+  if (*line == '%') {
+    char *exec[] = {"", "", "", "", ""};
+
+    if (*(line + 1) == 'F')
+    //スペースで区切ってしまうと正常に検索できないので
+    {
+      exec[0] = "F";
+      exec[1] = line + 3;
+    } else {
+      split(line + 1, exec, ' ', 5);
+    }
+    exec_command_str(exec, response);
+  } else {
+    if (profile_data_nitems >= MAX_PROFILES)
+      return;  //配列の容量数の限界を超えた時
+
+    new_profile(&profile_data_store[profile_data_nitems], line);
+  }
+}
+
+void new_profile(struct profile *p, char *line) {
+  char *error;
+
+  p->id = 0;
+  strncpy(p->school_name, "", 70);
+  p->create_at.y = 0;
+  p->create_at.m = 0;
+  p->create_at.d = 0;
+  strncpy(p->place, "", 70);
+
+  char *ret[5];
+  if (split(line, ret, ',', 5) < 5) {
+    printf("要素が不足しています\n");
+    return;  //不都合な入力の際は処理を中断する
+  }
+
+  p->id = strtoi(ret[0], &error);
+  if (*error != '\0') {
+    printf("idの入力に失敗しました\n");
+    return;  //数字が入力されていない場合は処理を中断する
+  }
+
+  strncpy(p->school_name, ret[1], LIMIT);
+
+  char *date[3];
+  int d[3] = {};
+  if (split(ret[2], date, '-', 3) < 3) {
+    printf("設立日の入力に失敗しました\n");
+    return;  //不都合な入力の際は処理を中断する
+  }
+  int i;
+  for (i = 0; i < 3; i++) {
+    d[i] = strtoi(date[i], &error);
+    if (*error != '\0') {
+      printf("設立日の入力に失敗しました\n");
+      return;  //数字が入力されていない場合は処理を中断する
+    }
+  }
+  p->create_at.y = d[0];
+  p->create_at.m = d[1];
+  p->create_at.d = d[2];
+
+  strncpy(p->place, ret[3], LIMIT);
+
+  p->note = (char *)malloc(strlen(ret[4]) + 1);  //動的にメモリを確保
+  strcpy(p->note, ret[4]);
+
+  profile_data_nitems++;
 }
 
 void exec_command_str(char *exec[], char *response) {
   char *error;
 
-  if (!strcmp("count", exec[0])) {
+  if (!strcmp("C", exec[0])) {
     cmd_check(response);
-  } else if (!strcmp("profile", exec[0])) {
+  } else if (!strcmp("P", exec[0])) {
     int param_num = strtoi(exec[1], &error);
     if (*error != '\0') {
       printf("パラメータは整数にしてください\n");
       return;
     }
     cmd_print(param_num, response);
+  } else if (!strcmp("W", exec[0])) {
+    cmd_write(exec[1], response);
   } else {
     fprintf(stderr, "Invalid command %s: ignored.\n", exec[0]);
   }
@@ -139,8 +221,12 @@ void cmd_print(int p, char *response) {
   }
 }
 
+void cmd_read(char *param, char *param2, char *response) {}
+
+void cmd_write(char *param, char *response) {}
+
 void print_profile(struct profile *p, char *response) {
-  char *tmp;
+  char tmp[BUF_SIZE] = "";
   sprintf(tmp, "Id    : %d\n", p->id);
   strcat(response, tmp);
   sprintf(tmp, "Name  : %s\n", p->school_name);
@@ -172,16 +258,13 @@ int split(char *str, char *ret[], char sep, int max) {
   return count;
 }
 
-int strtoi(char *param, char **error)
-{
-    long l = strtol(param, error, 10);
-    if (l >= __INT_MAX__)
-    {
-        l = __INT_MAX__;
-    }
-    if (l <= -__INT_MAX__)
-    {
-        l = -__INT_MAX__;
-    }
-    return (int)l;
+int strtoi(char *param, char **error) {
+  long l = strtol(param, error, 10);
+  if (l >= __INT_MAX__) {
+    l = __INT_MAX__;
+  }
+  if (l <= -__INT_MAX__) {
+    l = -__INT_MAX__;
+  }
+  return (int)l;
 }
