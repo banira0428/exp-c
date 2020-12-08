@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
   }
 
   // read stdin
-  char buf[BUF_SIZE];
+  char buf[BUF_SIZE] = "";
   int read_result = read(0, buf, BUF_SIZE);
   if(read_result == -1){
     printf("failed to read\n");

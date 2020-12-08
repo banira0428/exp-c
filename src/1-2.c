@@ -18,15 +18,19 @@ int main(int argc, char *argv[]) {
   }
 
   // read file
-  char buf[BUF_SIZE];
-  int result = read(fd, buf, BUF_SIZE);
-  if(result == -1){
+  char buf[BUF_SIZE] = "";
+  int read_result = read(fd, buf, BUF_SIZE);
+  if(read_result == -1){
     printf("failed to read\n");
     return 1;
   }
 
-  // print result
-  printf("%s\n", buf);
+  // write file
+  int write_result = write(1, buf, read_result);
+  if(write_result == -1){
+    printf("failed to write\n");
+    return 1;
+  }
 
   // close file
   close(fd);

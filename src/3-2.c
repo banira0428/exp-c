@@ -1,8 +1,8 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #define PORT_NO 80
@@ -54,8 +54,16 @@ int main() {
 
     // send request
     char send_buf[BUF_SIZE];
-    int length = strlen(recv_buf);
-    sprintf(send_buf,"%d",length);
+
+    // 文字数を計算する
+    // int length = strlen(recv_buf);
+    // sprintf(send_buf, "%d", length);
+
+    // 大文字に変換する
+    for (int i = 0; i < strlen(recv_buf); i++) {
+      send_buf[i] = recv_buf[i] - ('a' - 'A');
+    }
+
     int send_result = send(fd, send_buf, BUF_SIZE, 0);
     if (send_result == -1) {
       printf("failed to send\n");
