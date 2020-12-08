@@ -4,7 +4,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#define PORT_NO 80
+#define PORT_NO 12000
 #define BUF_SIZE 4096
 
 int main(int argc, char *argv[]) {

@@ -1,19 +1,37 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #define PORT_NO 10428
 #define BUF_SIZE 4096
 
+#define LIMIT 70
+#define MAX_PROFILES 10000
+
+struct date {
+  int y;  // year
+  int m;  // month
+  int d;  // day of month
+};
+
+struct profile {
+  int id;                   // id
+  char school_name[LIMIT];  // 学校名
+  struct date create_at;    // 設立日
+  char place[LIMIT];        // 住所
+  char *note;               //備考
+};
+
 int split(char *str, char *ret[], char sep, int max);
 void parse_line(char *line, char *response);
-void exec_command_str(char *exec[], char* response);
-void cmd_check(char* response);
+void exec_command_str(char *exec[], char *response);
+void cmd_check(char *response);
 
 int profile_data_nitems = 0; /* 現在のデータ数 */
+struct profile *profile_data_store_ptr[MAX_PROFILES];
 
 int main() {
   // create socket
@@ -60,7 +78,7 @@ int main() {
     }
 
     char response[BUF_SIZE] = "";
-    parse_line(request,response);    
+    parse_line(request, response);
 
     int send_result = send(fd, response, BUF_SIZE, 0);
     if (send_result == -1) {
@@ -76,18 +94,64 @@ void parse_line(char *line, char *response) {
   exec_command_str(exec, response);
 }
 
-void exec_command_str(char *exec[], char* response) {
+void exec_command_str(char *exec[], char *response) {
+  char *error;
 
   if (!strcmp("count", exec[0])) {
     cmd_check(response);
+  } else if (!strcmp("profile", exec[0])) {
+    int param_num = strtoi(exec[1], &error);
+    if (*error != '\0') {
+      printf("パラメータは整数にしてください\n");
+      return;
+    }
+    cmd_print(param_num, response);
   } else {
     fprintf(stderr, "Invalid command %s: ignored.\n", exec[0]);
   }
   return;
 }
 
-void cmd_check(char* response) {
-  sprintf(response, "%d", profile_data_nitems);
+void cmd_check(char *response) { sprintf(response, "%d", profile_data_nitems); }
+
+void cmd_print(int p, char *response) {
+  if (p > 0) {
+    if (p > profile_data_nitems)
+      p = profile_data_nitems;  //登録数よりも多い場合，要素数に合わせる
+
+    int i;
+    for (i = 0; i < p; i++) {
+      print_profile(profile_data_store_ptr[i], response);
+    }
+  } else if (p == 0) {
+    int i;
+    for (i = 0; i < profile_data_nitems; i++) {
+      print_profile(profile_data_store_ptr[i], response);
+    }
+  } else {
+    if (abs(p) > profile_data_nitems)
+      p = profile_data_nitems;  //登録数よりも多い場合，要素数に合わせる
+
+    int i;
+    for (i = profile_data_nitems - abs(p); i <= profile_data_nitems - 1; i++) {
+      print_profile(profile_data_store_ptr[i], response);
+    }
+  }
+}
+
+void print_profile(struct profile *p, char *response) {
+  char *tmp;
+  sprintf(tmp, "Id    : %d\n", p->id);
+  strcat(response, tmp);
+  sprintf(tmp, "Name  : %s\n", p->school_name);
+  strcat(response, tmp);
+  sprintf(tmp, "Birth : %04d-%02d-%02d\n", p->create_at.y, p->create_at.m,
+          p->create_at.d);
+  strcat(response, tmp);
+  sprintf(tmp, "Addr  : %s\n", p->place);
+  strcat(response, tmp);
+  sprintf(tmp, "Com.  : %s\n\n", p->note);
+  strcat(response, tmp);
 }
 
 int split(char *str, char *ret[], char sep, int max) {
@@ -106,4 +170,18 @@ int split(char *str, char *ret[], char sep, int max) {
     //ここでインクリメントしてないと，次のループで必ずbreakしてしまう．
   }
   return count;
+}
+
+int strtoi(char *param, char **error)
+{
+    long l = strtol(param, error, 10);
+    if (l >= __INT_MAX__)
+    {
+        l = __INT_MAX__;
+    }
+    if (l <= -__INT_MAX__)
+    {
+        l = -__INT_MAX__;
+    }
+    return (int)l;
 }

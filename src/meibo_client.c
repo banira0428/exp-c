@@ -15,7 +15,6 @@ void parse_line(char *line);
 int subst(char *str, char c1, char c2);
 int split(char *str, char *ret[], char sep, int max);
 void cmd_quit();
-void cmd_check();
 void exec_command_str(char *exec[]);
 int request(char *request, char *response);
 
@@ -78,24 +77,29 @@ void parse_line(char *line) {
 
 void exec_command_str(char *exec[]) {
   char *error;
-  int param_num;
 
   if (!strcmp("Q", exec[0])) {
-    cmd_quit();
+    exit(0);
   } else if (!strcmp("C", exec[0])) {
-    cmd_check();
+    char response[BUF_SIZE];
+    request("count", response);
+    printf("%s profile(s)\n", response);
+  } else if (!strcmp("P", exec[0])) {
+
+    int param_num = strtoi(exec[1], &error);
+        if (*error != '\0')
+        {
+            printf("パラメータは整数にしてください\n");
+            return; //数字が入力されていない場合は処理を中断する
+        }
+
+    char response[BUF_SIZE];
+    request("profile", response);
+    printf("%s\n", response);
   } else {
     fprintf(stderr, "Invalid command %s: ignored.\n", exec[0]);
   }
   return;
-}
-
-void cmd_quit() { exit(0); }
-
-void cmd_check() {
-  char response[BUF_SIZE];
-  request("count", response);
-  printf("%s profile(s)\n", response);
 }
 
 int request(char *request, char *response) {
@@ -143,4 +147,18 @@ int request(char *request, char *response) {
   close(soc);
 
   return 0;
+}
+
+int strtoi(char *param, char **error)
+{
+    long l = strtol(param, error, 10);
+    if (l >= __INT_MAX__)
+    {
+        l = __INT_MAX__;
+    }
+    if (l <= -__INT_MAX__)
+    {
+        l = -__INT_MAX__;
+    }
+    return (int)l;
 }
