@@ -58,7 +58,7 @@ void exec_command_str(char *exec[]) {
     cmd_read(exec[1]);
   } else if (!strcmp("W", exec[0])) {
     cmd_write(exec[1]);
-  } else {
+  }  else {
     fprintf(stderr, "Invalid command %s: ignored.\n", exec[0]);
   }
   return;

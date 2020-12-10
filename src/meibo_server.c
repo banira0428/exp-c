@@ -8,7 +8,8 @@
 
 #include "process_line.h"
 #define PORT_NO 10590
-#define BUF_SIZE 4096
+#define RESPONSE_BUF_SIZE 1048576
+#define BUF_SIZE 65536
 
 #define LIMIT 70
 #define MAX_PROFILES 10000
@@ -85,7 +86,7 @@ int main() {
 
     printf("request: %s\n", request);
 
-    char response[BUF_SIZE] = "";
+    char response[RESPONSE_BUF_SIZE] = "";
     parse_line(request, response);
 
     int send_result = send(fd, response, BUF_SIZE, 0);

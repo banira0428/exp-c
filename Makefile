@@ -13,6 +13,9 @@ client:
 cli: 
 	out/meibo_client.out
 
+cli-test: 
+	out/meibo_client.out < data/input.txt
+
 server: 
 	gcc-10 -o out/meibo_server.out src/meibo_server.c src/process_line.c
 

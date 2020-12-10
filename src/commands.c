@@ -42,7 +42,7 @@ void cmd_write(char *path) {
     return;
   }
 
-  char response[BUF_SIZE];
+  char response[RESPONSE_BUF_SIZE];
   request("%W", response);
 
   fprintf(fp, response);
@@ -52,8 +52,8 @@ void cmd_write(char *path) {
 }
 
 void cmd_print(char *size) {
-  char response[BUF_SIZE];
-  char query[BUF_SIZE] = "%P ";
+  char response[RESPONSE_BUF_SIZE];
+  char query[RESPONSE_BUF_SIZE] = "%P ";
   strcat(query, size);
   request(query, response);
   printf("%s\n", response);
