@@ -5,7 +5,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#define PORT_NO 10428
+#define PORT_NO 10590
 #define BUF_SIZE 4096
 
 #define LIMIT 70
@@ -81,7 +81,7 @@ int main() {
       printf("failed to receive\n");
     }
 
-    printf("%s\n",request);
+    printf("request: %s\n", request);
 
     char response[BUF_SIZE] = "";
     parse_line(request, response);
@@ -94,13 +94,10 @@ int main() {
   close(soc);
 }
 
-void make_profile_shadow(struct profile data_store[],
-                         struct profile *shadow[],
-                         int size)
-{
-    int i;
-    for (i = 0; i < size; i++)
-        shadow[i] = &data_store[i];
+void make_profile_shadow(struct profile data_store[], struct profile *shadow[],
+                         int size) {
+  int i;
+  for (i = 0; i < size; i++) shadow[i] = &data_store[i];
 }
 
 void parse_line(char *line, char *response) {
@@ -223,7 +220,12 @@ void cmd_print(int p, char *response) {
 
 void cmd_read(char *param, char *param2, char *response) {}
 
-void cmd_write(char *param, char *response) {}
+void cmd_write(char *param, char *response) {
+  int i;
+  for (i = 0; i < profile_data_nitems; i++) {
+    print_profile_csv(profile_data_store_ptr[i], response);
+  }
+}
 
 void print_profile(struct profile *p, char *response) {
   char tmp[BUF_SIZE] = "";
@@ -237,6 +239,13 @@ void print_profile(struct profile *p, char *response) {
   sprintf(tmp, "Addr  : %s\n", p->place);
   strcat(response, tmp);
   sprintf(tmp, "Com.  : %s\n\n", p->note);
+  strcat(response, tmp);
+}
+
+void print_profile_csv(struct profile *p, char *response) {
+  char tmp[BUF_SIZE] = "";
+  sprintf(tmp, "%d,%s,%04d-%d-%d,%s,%s\n", p->id, p->school_name,
+          p->create_at.y, p->create_at.m, p->create_at.d, p->place, p->note);
   strcat(response, tmp);
 }
 

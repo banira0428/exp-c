@@ -5,16 +5,30 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#define PORT_NO 10428
+#include "commands.h"
+#define PORT_NO 10590
 #define BUF_SIZE 4096
 #define INPUT_MAX 1024
+#define LIMIT 70
+
+struct date {
+  int y;  // year
+  int m;  // month
+  int d;  // day of month
+};
+struct profile {
+  int id;                   // id
+  char school_name[LIMIT];  // 学校名
+  struct date create_at;    // 設立日
+  char place[LIMIT];        // 住所
+  char *note;               //備考
+};
 
 int get_line(char *line);
 int get_line_fp(FILE *fp, char *line);
 void parse_line(char *line);
 int subst(char *str, char c1, char c2);
 int split(char *str, char *ret[], char sep, int max);
-void cmd_quit();
 void exec_command_str(char *exec[]);
 int request(char *request, char *response);
 
@@ -93,7 +107,7 @@ void exec_command_str(char *exec[]) {
   char *error;
 
   if (!strcmp("Q", exec[0])) {
-    exit(0);
+    cmd_quit();
   } else if (!strcmp("C", exec[0])) {
     char response[BUF_SIZE];
     request("%C", response);
@@ -107,21 +121,50 @@ void exec_command_str(char *exec[]) {
 
     char response[BUF_SIZE];
     char query[BUF_SIZE] = "%P ";
-    strcat(query,exec[1]);
+    strcat(query, exec[1]);
     request(query, response);
     printf("%s\n", response);
   } else if (!strcmp("R", exec[0]) || !strcmp("Read", exec[0])) {
-    cmd_read(exec[1], exec[2]);
+    cmd_read(exec[1]);
+  } else if (!strcmp("W", exec[0]) ) {
+    cmd_write(exec[1],exec[2]);
   } else {
     fprintf(stderr, "Invalid command %s: ignored.\n", exec[0]);
   }
   return;
 }
 
-void cmd_read(char *param, char *param2)
+void cmd_read(char *param) {
+  FILE *fp;
+  fp = fopen(param, "r");
+
+  if (fp == NULL) {
+    fprintf(stderr, "Could not open file: %s\n", param);
+    return;
+  }
+
+  char line[INPUT_MAX];
+
+  while (get_line_fp(fp, line)) { /* fp を引数に追加 */
+    parse_line(line);
+  }
+
+  fclose(fp);
+
+  printf("success: cmd_read");
+
+  return;
+}
+
+void cmd_write(char *param, char *param2)
 {
     FILE *fp;
-    fp = fopen(param, "r");
+    if (*param == '\0')
+    {
+        param = "data/output.csv";
+    }
+
+    fp = fopen(param, "w");
 
     if (fp == NULL)
     {
@@ -129,23 +172,11 @@ void cmd_read(char *param, char *param2)
         return;
     }
 
-    char line[INPUT_MAX];
+    char response[BUF_SIZE];
+    request("%W",response);
 
-    //読み込み
-
-    while (get_line_fp(fp, line))
-    { /* fp を引数に追加 */
-        parse_line(line);
-    }
-
+    fprintf(fp, response);
     fclose(fp);
-
-    char *error;
-    int param_num = strtoi(param2, &error);
-    if (*error != '\0')
-    {
-        return; //数字が入力されていない場合は処理を中断する
-    }
 
     return;
 }
