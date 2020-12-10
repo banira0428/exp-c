@@ -14,7 +14,7 @@ cli:
 	out/meibo_client.out
 
 server: 
-	gcc-10 -o out/meibo_server.out src/meibo_server.c
+	gcc-10 -o out/meibo_server.out src/meibo_server.c src/process_line.c
 
 ser: 
 	out/meibo_server.out

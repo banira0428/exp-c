@@ -21,7 +21,6 @@ void cmd_read(char *path) {
   while (get_line_fp(fp, line)) { /* fp を引数に追加 */
     char response[BUF_SIZE];
     request(line, response);
-    printf("%s\n", response);
   }
 
   fclose(fp);
@@ -31,7 +30,7 @@ void cmd_read(char *path) {
   return;
 };
 
-void cmd_write(char *path, char *param2) {
+void cmd_write(char *path) {
   FILE *fp;
   if (*path == '\0') {
     path = "data/output.csv";

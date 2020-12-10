@@ -5,6 +5,8 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+
+#include "process_line.h"
 #define PORT_NO 10590
 #define BUF_SIZE 4096
 
@@ -103,20 +105,13 @@ void make_profile_shadow(struct profile data_store[], struct profile *shadow[],
 void parse_line(char *line, char *response) {
   if (*line == '%') {
     char *exec[] = {"", "", "", "", ""};
-
-    if (*(line + 1) == 'F')
-    //スペースで区切ってしまうと正常に検索できないので
-    {
-      exec[0] = "F";
-      exec[1] = line + 3;
-    } else {
-      split(line + 1, exec, ' ', 5);
-    }
+    split(line + 1, exec, ' ', 5);
     exec_command_str(exec, response);
   } else {
-    if (profile_data_nitems >= MAX_PROFILES)
+    if (profile_data_nitems >= MAX_PROFILES){
+      sprintf(response, "The upper limit has been reached");
       return;  //配列の容量数の限界を超えた時
-
+    }
     new_profile(&profile_data_store[profile_data_nitems], line);
   }
 }
@@ -218,8 +213,6 @@ void cmd_print(int p, char *response) {
   }
 }
 
-void cmd_read(char *param, char *param2, char *response) {}
-
 void cmd_write(char *param, char *response) {
   int i;
   for (i = 0; i < profile_data_nitems; i++) {
@@ -247,24 +240,6 @@ void print_profile_csv(struct profile *p, char *response) {
   sprintf(tmp, "%d,%s,%04d-%d-%d,%s,%s\n", p->id, p->school_name,
           p->create_at.y, p->create_at.m, p->create_at.d, p->place, p->note);
   strcat(response, tmp);
-}
-
-int split(char *str, char *ret[], char sep, int max) {
-  int count = 0;
-  while (1) {
-    ret[count] = str;  //最初に現れた区切り文字以外の文字のアドレスを代入
-    count++;
-    if (count >= max) break;  //分割数の上限に達したら終わり
-    while (*str != sep &&
-           *str) {  //区切り文字か終端記号が現れるまでアドレスを進める
-      str++;
-    }
-    if (*str == '\0') break;  //終端記号なら終わり
-    *str = '\0';              //区切り文字を終端記号に置き換える
-    str++;
-    //ここでインクリメントしてないと，次のループで必ずbreakしてしまう．
-  }
-  return count;
 }
 
 int strtoi(char *param, char **error) {

@@ -9,5 +9,5 @@
 void cmd_quit();
 void cmd_check();
 void cmd_read(char* path);
-void cmd_write();
-void cmd_print();
+void cmd_write(char* path);
+void cmd_print(char* size);

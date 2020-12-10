@@ -9,7 +9,6 @@
 #include "client.h"
 #include "commands.h"
 #include "process_line.h"
-#define PORT_NO 10590
 #define INPUT_MAX 1024
 #define LIMIT 70
 
@@ -28,7 +27,6 @@ struct profile {
 
 void parse_line(char *line);
 void exec_command_str(char *exec[]);
-int strtoi(char *param, char **error);
 
 int main() {
   char line[INPUT_MAX + 1];
@@ -41,18 +39,15 @@ int main() {
 void parse_line(char *line) {
   if (*line == '%') {
     char *exec[] = {"", "", "", "", ""};
-    split(line + 1, exec, ' ', 5);  
+    split(line + 1, exec, ' ', 5);
     exec_command_str(exec);
   } else {
     char response[BUF_SIZE];
     request(line, response);
-    printf("%s\n", response);
   }
 }
 
 void exec_command_str(char *exec[]) {
-  char *error;
-
   if (!strcmp("Q", exec[0])) {
     cmd_quit();
   } else if (!strcmp("C", exec[0])) {
@@ -62,20 +57,9 @@ void exec_command_str(char *exec[]) {
   } else if (!strcmp("R", exec[0])) {
     cmd_read(exec[1]);
   } else if (!strcmp("W", exec[0])) {
-    cmd_write(exec[1], exec[2]);
+    cmd_write(exec[1]);
   } else {
     fprintf(stderr, "Invalid command %s: ignored.\n", exec[0]);
   }
   return;
-}
-
-int strtoi(char *param, char **error) {
-  long l = strtol(param, error, 10);
-  if (l >= __INT_MAX__) {
-    l = __INT_MAX__;
-  }
-  if (l <= -__INT_MAX__) {
-    l = -__INT_MAX__;
-  }
-  return (int)l;
 }
