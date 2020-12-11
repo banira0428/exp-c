@@ -146,7 +146,12 @@ void exec_command_str(char *exec[], char *response) {
     }
     cmd_print(param_num, response);
   } else if (!strcmp("W", exec[0])) {
-    cmd_write(exec[1], response);
+    int param_num = strtoi(exec[1], &error);
+    if (*error != '\0') {
+      printf("パラメータは整数にしてください\n");
+      return;
+    }
+    cmd_write(param_num, response);
   } else {
     fprintf(stderr, "Invalid command %s: ignored.\n", exec[0]);
   }
@@ -156,16 +161,7 @@ void exec_command_str(char *exec[], char *response) {
 void cmd_check(char *response) { sprintf(response, "%d", profile_data_nitems); }
 
 void cmd_print(int index, char *response) {
-  print_profile(profile_data_store_ptr[index], response);
-}
-
-void cmd_write(char *param, char *response) {
-  char *error;
-  int index = strtoi(param, error);
-  print_profile_csv(profile_data_store_ptr[index], response);
-}
-
-void print_profile(struct profile *p, char *response) {
+  struct profile *p = profile_data_store_ptr[index];
   char tmp[BUF_SIZE] = "";
   sprintf(tmp, "Id    : %d\n", p->id);
   strcat(response, tmp);
@@ -180,7 +176,9 @@ void print_profile(struct profile *p, char *response) {
   strcat(response, tmp);
 }
 
-void print_profile_csv(struct profile *p, char *response) {
+void cmd_write(int index, char *response) {
+  char *error;
+  struct profile *p = profile_data_store_ptr[index];
   sprintf(response, "%d,%s,%04d-%d-%d,%s,%s\n", p->id, p->school_name,
           p->create_at.y, p->create_at.m, p->create_at.d, p->place, p->note);
 }
