@@ -60,15 +60,49 @@ void cmd_write(char *path) {
   fprintf(fp, result);
   fclose(fp);
 
+  printf("write success: %s\n", path);
+
   return;
 }
 
-void cmd_print(char *size) {
-  char response[RESPONSE_BUF_SIZE];
-  char query[RESPONSE_BUF_SIZE] = "%P ";
-  strcat(query, size);
-  request(query, response);
-  printf("%s\n", response);
+void cmd_print(char *num) {
 
+  char response[BUF_SIZE];
+  request("%C", response);
+
+  char result[RESPONSE_BUF_SIZE];
+  int size = atoi(response);
+  int p = atoi(num);
+
+  if (p > 0) {
+    if (p > size) p = size;  //登録数よりも多い場合，要素数に合わせる
+
+    int i;
+    for (i = 0; i < p; i++) {
+      print_profile(i);
+    }
+  } else if (p == 0) {
+    int i;
+    for (i = 0; i < size; i++) {
+      print_profile(i);
+    }
+  } else {
+    if (abs(p) > size) p = size;  //登録数よりも多い場合，要素数に合わせる
+
+    int i;
+    for (i = size - abs(p); i <= size - 1; i++) {
+      print_profile(i);
+    }
+  }
   return;
+}
+
+void print_profile(int index) {
+  char query[BUF_SIZE] = "%P ";
+  char tmp[BUF_SIZE];
+  char number[BUF_SIZE];
+  sprintf(number, "%d", index);
+  strcat(query, number);
+  request(query, tmp);
+  printf("%s", tmp);
 }
