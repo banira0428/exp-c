@@ -31,7 +31,7 @@ int main() {
   // listen socket
   int listen_result = listen(soc, 5);
   if (listen_result == -1) {
-    printf("failed to listen\n");
+    perror("failed to listen");
     return 1;
   }
 
@@ -41,7 +41,7 @@ int main() {
     int c_sa_len = sizeof(c_sa);
     int fd = accept(soc, (struct sockaddr *)&c_sa, &c_sa_len);
     if (fd == -1) {
-      printf("failed to accept\n");
+      perror("failed to accept");
       return 1;
     }
 
@@ -49,7 +49,7 @@ int main() {
     char request[BUF_SIZE] = "";
     int recv_result = recv(fd, request, BUF_SIZE, 0);
     if (recv_result == -1) {
-      printf("failed to receive\n");
+      perror("failed to receive");
     }
 
     char response[BUF_SIZE] = "";
@@ -59,6 +59,7 @@ int main() {
     if (send_result == -1) {
       perror("failed to send");
     }
+    close(fd);
   }
   close(soc);
 }

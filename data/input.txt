@@ -2,4 +2,5 @@
 %R data/sample.csv
 %C
 %W
-%P 10
+%P 1
+%Q
