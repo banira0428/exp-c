@@ -66,7 +66,6 @@ void cmd_write(char *path) {
 }
 
 void cmd_print(char *num) {
-
   char response[BUF_SIZE];
   request("%C", response);
 
@@ -95,6 +94,14 @@ void cmd_print(char *num) {
     }
   }
   return;
+}
+
+void cmd_history() {
+  char query[BUF_SIZE] = "%H";
+  char response[BUF_SIZE];
+  
+  request("%H", response);
+  printf("%s\n", response);
 }
 
 void print_profile(int index) {

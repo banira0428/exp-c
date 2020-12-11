@@ -6,6 +6,8 @@ int profile_data_nitems = 0; /* 現在のデータ数 */
 struct profile profile_data_store[MAX_PROFILES];
 struct profile *profile_data_store_ptr[MAX_PROFILES];
 
+char history[HISTORY_MAX][BUF_SIZE];
+
 int main() {
   make_profile_shadow(profile_data_store, profile_data_store_ptr, MAX_PROFILES);
 
@@ -71,6 +73,21 @@ void make_profile_shadow(struct profile data_store[], struct profile *shadow[],
 
 void parse_line(char *line, char *response) {
   if (*line == '%') {
+
+    if (strlen(history[HISTORY_MAX - 1]) != 0) {
+      for (int i = 0; i < HISTORY_MAX - 1; i++) {
+        strcpy(history[i], history[i + 1]);
+      }
+      strcpy(history[HISTORY_MAX - 1], line);
+    } else {
+      for (int i = 0; i < HISTORY_MAX; i++) {
+        if (strlen(history[i]) == 0) {
+          strcpy(history[i], line);
+          break;
+        }
+      }
+    }
+
     char *exec[] = {"", "", "", "", ""};
     split(line + 1, exec, ' ', 5);
     exec_command_str(exec, response);
@@ -153,6 +170,8 @@ void exec_command_str(char *exec[], char *response) {
       return;
     }
     cmd_write(param_num, response);
+  } else if (!strcmp("H", exec[0])) {
+    cmd_history(response);
   } else {
     fprintf(stderr, "Invalid command %s: ignored.\n", exec[0]);
   }
@@ -178,10 +197,19 @@ void cmd_print(int index, char *response) {
 }
 
 void cmd_write(int index, char *response) {
-  char *error;
   struct profile *p = profile_data_store_ptr[index];
   sprintf(response, "%d,%s,%04d-%d-%d,%s,%s\n", p->id, p->school_name,
           p->create_at.y, p->create_at.m, p->create_at.d, p->place, p->note);
+}
+
+void cmd_history(char *response) {
+  for (int i = 0; i < HISTORY_MAX; i++) {
+    if (strlen(history[i]) != 0) {
+      char tmp[BUF_SIZE];
+      sprintf(tmp, "%d: %s\n", i + 1, history[i]);
+      strcat(response, tmp);
+    }
+  }
 }
 
 int strtoi(char *param, char **error) {

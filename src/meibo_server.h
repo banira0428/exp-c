@@ -13,6 +13,7 @@
 
 #define MAX_PROFILES 10000
 #define INPUT_MAX 1024
+#define HISTORY_MAX 10
 
 void make_profile_shadow(struct profile data_store[], struct profile *shadow[],
                          int size);

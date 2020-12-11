@@ -11,4 +11,5 @@ void cmd_check();
 void cmd_read(char* path);
 void cmd_write(char* path);
 void cmd_print(char* size);
+void cmd_history();
 void print_profile(int index);
