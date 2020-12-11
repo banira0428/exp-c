@@ -9,7 +9,7 @@
 #include "process_line.h"
 #define PORT_NO 10590
 #define RESPONSE_BUF_SIZE 1048576
-#define BUF_SIZE 65536
+#define BUF_SIZE 1024
 
 #define LIMIT 70
 #define MAX_PROFILES 10000
@@ -84,14 +84,14 @@ int main() {
       printf("failed to receive\n");
     }
 
-    printf("request: %s\n", request);
+    // printf("request: %s\n", request);
 
-    char response[RESPONSE_BUF_SIZE] = "";
+    char response[BUF_SIZE] = "";
     parse_line(request, response);
 
     int send_result = send(fd, response, BUF_SIZE, 0);
     if (send_result == -1) {
-      printf("failed to send\n");
+      perror("failed to send");
     }
   }
   close(soc);
@@ -109,11 +109,12 @@ void parse_line(char *line, char *response) {
     split(line + 1, exec, ' ', 5);
     exec_command_str(exec, response);
   } else {
-    if (profile_data_nitems >= MAX_PROFILES){
+    if (profile_data_nitems >= MAX_PROFILES) {
       sprintf(response, "The upper limit has been reached");
       return;  //配列の容量数の限界を超えた時
     }
     new_profile(&profile_data_store[profile_data_nitems], line);
+    sprintf(response, "new profile created");
   }
 }
 
@@ -215,10 +216,9 @@ void cmd_print(int p, char *response) {
 }
 
 void cmd_write(char *param, char *response) {
-  int i;
-  for (i = 0; i < profile_data_nitems; i++) {
-    print_profile_csv(profile_data_store_ptr[i], response);
-  }
+  char *error;
+  int index = strtoi(param, error);
+  print_profile_csv(profile_data_store_ptr[index], response);
 }
 
 void print_profile(struct profile *p, char *response) {
@@ -237,10 +237,8 @@ void print_profile(struct profile *p, char *response) {
 }
 
 void print_profile_csv(struct profile *p, char *response) {
-  char tmp[BUF_SIZE] = "";
-  sprintf(tmp, "%d,%s,%04d-%d-%d,%s,%s\n", p->id, p->school_name,
+  sprintf(response, "%d,%s,%04d-%d-%d,%s,%s\n", p->id, p->school_name,
           p->create_at.y, p->create_at.m, p->create_at.d, p->place, p->note);
-  strcat(response, tmp);
 }
 
 int strtoi(char *param, char **error) {

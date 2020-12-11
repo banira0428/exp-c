@@ -42,10 +42,22 @@ void cmd_write(char *path) {
     return;
   }
 
-  char response[RESPONSE_BUF_SIZE];
-  request("%W", response);
+  char response[BUF_SIZE];
+  request("%C", response);
 
-  fprintf(fp, response);
+  char result[RESPONSE_BUF_SIZE];
+  int size = atoi(response);
+  for (int i = 0; i < size; i++) {
+    char query[BUF_SIZE] = "%W ";
+    char tmp[BUF_SIZE];
+    char number[BUF_SIZE];
+    sprintf(number, "%d", i);
+    strcat(query, number);
+    request(query, tmp);
+    strcat(result, tmp);
+  }
+
+  fprintf(fp, result);
   fclose(fp);
 
   return;
