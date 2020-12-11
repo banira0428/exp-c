@@ -1,38 +1,6 @@
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
+#include "meibo_server.h"
 
-#include "process_line.h"
-#define PORT_NO 10590
-#define RESPONSE_BUF_SIZE 1048576
-#define BUF_SIZE 1024
-
-#define LIMIT 70
-#define MAX_PROFILES 10000
-#define INPUT_MAX 1024
-
-struct date {
-  int y;  // year
-  int m;  // month
-  int d;  // day of month
-};
-
-struct profile {
-  int id;                   // id
-  char school_name[LIMIT];  // 学校名
-  struct date create_at;    // 設立日
-  char place[LIMIT];        // 住所
-  char *note;               //備考
-};
-
-int split(char *str, char *ret[], char sep, int max);
-void parse_line(char *line, char *response);
 void exec_command_str(char *exec[], char *response);
-void cmd_check(char *response);
 
 int profile_data_nitems = 0; /* 現在のデータ数 */
 struct profile profile_data_store[MAX_PROFILES];
@@ -84,8 +52,6 @@ int main() {
       printf("failed to receive\n");
     }
 
-    // printf("request: %s\n", request);
-
     char response[BUF_SIZE] = "";
     parse_line(request, response);
 
@@ -99,8 +65,7 @@ int main() {
 
 void make_profile_shadow(struct profile data_store[], struct profile *shadow[],
                          int size) {
-  int i;
-  for (i = 0; i < size; i++) shadow[i] = &data_store[i];
+  for (int i = 0; i < size; i++) shadow[i] = &data_store[i];
 }
 
 void parse_line(char *line, char *response) {
@@ -111,10 +76,10 @@ void parse_line(char *line, char *response) {
   } else {
     if (profile_data_nitems >= MAX_PROFILES) {
       sprintf(response, "The upper limit has been reached");
-      return;  //配列の容量数の限界を超えた時
+    } else {
+      new_profile(&profile_data_store[profile_data_nitems], line);
+      sprintf(response, "new profile created");
     }
-    new_profile(&profile_data_store[profile_data_nitems], line);
-    sprintf(response, "new profile created");
   }
 }
 
