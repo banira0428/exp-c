@@ -26,7 +26,7 @@ int main() {
   s_sa.sin_port = htons(PORT_NO);
   int bind_result = bind(soc, (struct sockaddr *)&s_sa, sizeof(s_sa));
   if (bind_result == -1) {
-    printf("failed to bind port\n");
+    perror("failed to bind port\n");
     return 1;
   }
 
@@ -55,14 +55,21 @@ int main() {
       break;
     }
 
-    char response[BUF_SIZE] = "";
+    char response[RESPONSE_BUF_SIZE] = "";
     parse_line(request, response);
 
-    int send_result = send(fd, response, BUF_SIZE, 0);
-    if (send_result == -1) {
-      perror("failed to send");
-      break;
-    }
+    int send_result = 0;
+    int sended_bytes = 0;
+    do {
+      send_result = send(fd, response + sended_bytes,
+                         fmin(BUF_SIZE, strlen(response + sended_bytes) + 1), 0);
+      sended_bytes += send_result;
+      if (send_result == -1) {
+        perror("failed to send");
+        break;
+      }
+    } while (send_result == BUF_SIZE);
+
     close(fd);
   }
   close(soc);
@@ -75,7 +82,6 @@ void make_profile_shadow(struct profile data_store[], struct profile *shadow[],
 
 void parse_line(char *line, char *response) {
   if (*line == '%') {
-
     if (strlen(history[HISTORY_MAX - 1]) != 0) {
       for (int i = 0; i < HISTORY_MAX - 1; i++) {
         strcpy(history[i], history[i + 1]);
@@ -166,12 +172,7 @@ void exec_command_str(char *exec[], char *response) {
     }
     cmd_print(param_num, response);
   } else if (!strcmp("W", exec[0])) {
-    int param_num = strtoi(exec[1], &error);
-    if (*error != '\0') {
-      printf("パラメータは整数にしてください\n");
-      return;
-    }
-    cmd_write(param_num, response);
+    cmd_write(response);
   } else if (!strcmp("H", exec[0])) {
     cmd_history(response);
   } else {
@@ -198,10 +199,14 @@ void cmd_print(int index, char *response) {
   strcat(response, tmp);
 }
 
-void cmd_write(int index, char *response) {
-  struct profile *p = profile_data_store_ptr[index];
-  sprintf(response, "%d,%s,%04d-%d-%d,%s,%s\n", p->id, p->school_name,
-          p->create_at.y, p->create_at.m, p->create_at.d, p->place, p->note);
+void cmd_write(char *response) {
+  for (int i = 0; i < profile_data_nitems; i++) {
+    struct profile *p = profile_data_store_ptr[i];
+    char tmp[BUF_SIZE] = "";
+    sprintf(tmp, "%d,%s,%04d-%d-%d,%s,%s\n", p->id, p->school_name,
+            p->create_at.y, p->create_at.m, p->create_at.d, p->place, p->note);
+    strcat(response, tmp);
+  }
 }
 
 void cmd_history(char *response) {

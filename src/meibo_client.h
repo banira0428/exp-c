@@ -9,6 +9,7 @@
 #include "commands.h"
 #include "process_line.h"
 #define INPUT_MAX 1024
+#define RESPONSE_BUF_SIZE 1048576
 
 void parse_line(char *line);
 void exec_command_str(char *exec[]);

@@ -36,11 +36,17 @@ int request(char *request, char *response) {
   }
 
   // receive response
-  int recv_result = recv(soc, response, BUF_SIZE, 0);
-  if (recv_result == -1) {
-    printf("failed to receive\n");
-    return -1;
-  }
+  int recv_result = 0;
+  sprintf(response,"");
+  do {
+    char tmp[BUF_SIZE] = "";
+    recv_result = recv(soc, tmp, BUF_SIZE, 0);
+    strcat(response, tmp);
+    if (recv_result == -1) {
+      printf("failed to receive\n");
+      return -1;
+    }
+  } while (recv_result == BUF_SIZE);
 
   close(soc);
 

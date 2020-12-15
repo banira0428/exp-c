@@ -1,3 +1,4 @@
+#include <math.h>
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,6 +11,7 @@
 
 #define PORT_NO 10590
 #define BUF_SIZE 1024
+#define RESPONSE_BUF_SIZE 1048576
 
 #define MAX_PROFILES 10000
 #define INPUT_MAX 1024
@@ -21,5 +23,5 @@ void parse_line(char *line, char *response);
 void new_profile(struct profile *p, char *line);
 void cmd_check(char *response);
 void cmd_print(int index, char *response);
-void cmd_write(int index, char *response);
+void cmd_write(char *response);
 int strtoi(char *param, char **error);
