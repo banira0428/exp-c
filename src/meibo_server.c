@@ -183,7 +183,30 @@ void exec_command_str(char *exec[], char *response) {
 
 void cmd_check(char *response) { sprintf(response, "%d", profile_data_nitems); }
 
-void cmd_print(int index, char *response) {
+void cmd_print(int p, char *response) {
+  if (p > 0) {
+    if (p > profile_data_nitems) p = profile_data_nitems;  //登録数よりも多い場合，要素数に合わせる
+
+    int i;
+    for (i = 0; i < p; i++) {
+      print_profile(i,response);
+    }
+  } else if (p == 0) {
+    int i;
+    for (i = 0; i < profile_data_nitems; i++) {
+      print_profile(i,response);
+    }
+  } else {
+    if (abs(p) > profile_data_nitems) p = profile_data_nitems;  //登録数よりも多い場合，要素数に合わせる
+
+    int i;
+    for (i = profile_data_nitems - abs(p); i <= profile_data_nitems - 1; i++) {
+      print_profile(i,response);
+    }
+  }
+}
+
+void print_profile(int index, char *response) {
   struct profile *p = profile_data_store_ptr[index];
   char tmp[BUF_SIZE] = "";
   sprintf(tmp, "Id    : %d\n", p->id);
