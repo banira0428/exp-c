@@ -52,6 +52,7 @@ int main() {
     int recv_result = recv(fd, request, BUF_SIZE, 0);
     if (recv_result == -1) {
       perror("failed to receive");
+      break;
     }
 
     char response[BUF_SIZE] = "";
@@ -60,6 +61,7 @@ int main() {
     int send_result = send(fd, response, BUF_SIZE, 0);
     if (send_result == -1) {
       perror("failed to send");
+      break;
     }
     close(fd);
   }

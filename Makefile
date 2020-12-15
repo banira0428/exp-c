@@ -3,6 +3,9 @@ NAME =
 compile:
 	gcc-10 -o out/${NAME}.out src/${NAME}.c
 
+debug:
+	gcc-10 -o out/${NAME}.out  -g3 src/${NAME}.c
+
 run: 
 	gcc-10 -o out/${NAME}.out src/${NAME}.c
 	out/${NAME}.out data/${NAME}
