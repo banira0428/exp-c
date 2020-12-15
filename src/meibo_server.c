@@ -49,11 +49,16 @@ int main() {
 
     // receive response
     char request[BUF_SIZE] = "";
-    int recv_result = recv(fd, request, BUF_SIZE, 0);
-    if (recv_result == -1) {
-      perror("failed to receive");
-      break;
-    }
+    int recv_result = 0;
+    do {
+      char tmp[BUF_SIZE] = "";
+      recv_result = recv(fd, tmp, BUF_SIZE, 0);
+      strcat(request, tmp);
+      if (recv_result == -1) {
+        printf("failed to receive\n");
+        return -1;
+      }
+    } while (recv_result == BUF_SIZE);
 
     char response[RESPONSE_BUF_SIZE] = "";
     parse_line(request, response);
@@ -61,8 +66,9 @@ int main() {
     int send_result = 0;
     int sended_bytes = 0;
     do {
-      send_result = send(fd, response + sended_bytes,
-                         fmin(BUF_SIZE, strlen(response + sended_bytes) + 1), 0);
+      send_result =
+          send(fd, response + sended_bytes,
+               fmin(BUF_SIZE, strlen(response + sended_bytes) + 1), 0);
       sended_bytes += send_result;
       if (send_result == -1) {
         perror("failed to send");
@@ -185,23 +191,25 @@ void cmd_check(char *response) { sprintf(response, "%d", profile_data_nitems); }
 
 void cmd_print(int p, char *response) {
   if (p > 0) {
-    if (p > profile_data_nitems) p = profile_data_nitems;  //登録数よりも多い場合，要素数に合わせる
+    if (p > profile_data_nitems)
+      p = profile_data_nitems;  //登録数よりも多い場合，要素数に合わせる
 
     int i;
     for (i = 0; i < p; i++) {
-      print_profile(i,response);
+      print_profile(i, response);
     }
   } else if (p == 0) {
     int i;
     for (i = 0; i < profile_data_nitems; i++) {
-      print_profile(i,response);
+      print_profile(i, response);
     }
   } else {
-    if (abs(p) > profile_data_nitems) p = profile_data_nitems;  //登録数よりも多い場合，要素数に合わせる
+    if (abs(p) > profile_data_nitems)
+      p = profile_data_nitems;  //登録数よりも多い場合，要素数に合わせる
 
     int i;
     for (i = profile_data_nitems - abs(p); i <= profile_data_nitems - 1; i++) {
-      print_profile(i,response);
+      print_profile(i, response);
     }
   }
 }

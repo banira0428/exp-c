@@ -29,15 +29,21 @@ int request(char *request, char *response) {
   }
 
   // send request
-  int send_result = send(soc, request, BUF_SIZE, 0);
-  if (send_result == -1) {
-    printf("failed to send\n");
-    return -1;
-  }
+  int send_result = 0;
+  int sended_bytes = 0;
+  do {
+    send_result = send(soc, request + sended_bytes,
+                       fmin(BUF_SIZE, strlen(request + sended_bytes) + 1), 0);
+    sended_bytes += send_result;
+    if (send_result == -1) {
+      perror("failed to send");
+      break;
+    }
+  } while (send_result == BUF_SIZE);
 
   // receive response
   int recv_result = 0;
-  sprintf(response,"");
+  sprintf(response, "");
   do {
     char tmp[BUF_SIZE] = "";
     recv_result = recv(soc, tmp, BUF_SIZE, 0);
