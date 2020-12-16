@@ -53,4 +53,11 @@ INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/ptex-fonts/standard/tgoth10.t
 INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/ptex-fonts/jis/jisg.tfm
 INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/public/cm/cmss12.tfm
 OUTPUT report.dvi
+INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/ptex-fonts/standard/tgoth10.tfm
+INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/ptex-fonts/jis/jisg.tfm
+INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/public/cm/cmss12.tfm
+INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/ptex-fonts/standard/tgoth10.tfm
+INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/ptex-fonts/jis/jisg.tfm
+INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/public/cm/cmss10.tfm
+INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
 INPUT report.aux
