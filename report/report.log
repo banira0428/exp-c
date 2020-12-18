@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.2-190131-2.6 (utf8.euc) (TeX Live 2019) (preloaded format=platex 2019.5.23)  18 DEC 2020 11:01
+This is e-pTeX, Version 3.14159265-p3.8.2-190131-2.6 (utf8.euc) (TeX Live 2019) (preloaded format=platex 2019.5.23)  18 DEC 2020 15:11
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -129,38 +129,42 @@ File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 138.
  [4] [5]
-Overfull \hbox (18.38393pt too wide) in paragraph at lines 193--193
-[]\OT1/cmtt/m/n/10 5100046,The Bridge,1845-11-2,14 Seafield Road Longman Inverness,SEN Unit 2.0 Open[] 
- []
-
-[6] [7] [8] [9] [10] [11] [12] [13] [14] [15] [16] [17]
-Overfull \hbox (44.6337pt too wide) in paragraph at lines 681--681
+LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 184.
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 184.
+LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 185.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 185.
+ [6] [7] [8] [9] [10] [11] [12] [13] [14] [15] [16] [17]
+Overfull \hbox (44.6337pt too wide) in paragraph at lines 688--688
 []      \OT1/cmtt/m/n/10 void cmd_check(char *response) { sprintf(response, "%d", profile_data_nitems); }[] 
  []
 
 [18]
-Overfull \hbox (39.38374pt too wide) in paragraph at lines 681--681
+Overfull \hbox (39.38374pt too wide) in paragraph at lines 688--688
 []          \OT1/cmtt/m/n/10 for (i = profile_data_nitems - abs(p); i <= profile_data_nitems - 1; i++) {[] 
  []
 
 
-Overfull \hbox (13.13397pt too wide) in paragraph at lines 681--681
+Overfull \hbox (13.13397pt too wide) in paragraph at lines 688--688
 []        \OT1/cmtt/m/n/10 sprintf(tmp, "Birth : %04d-%02d-%02d\n", p->create_at.y, p->create_at.m,[] 
  []
 
-
-Overfull \hbox (39.38374pt too wide) in paragraph at lines 681--681
+[19]
+Overfull \hbox (39.38374pt too wide) in paragraph at lines 688--688
 []                  \OT1/cmtt/m/n/10 p->create_at.y, p->create_at.m, p->create_at.d, p->place, p->note);[] 
  []
 
-[19] [20] (./report.aux) ) 
+[20] (./report.aux) ) 
 Here is how much of TeX's memory you used:
- 860 strings out of 493223
- 10473 string characters out of 6144415
+ 867 strings out of 493223
+ 10552 string characters out of 6144415
  81425 words of memory out of 5000000
- 4896 multiletter control sequences out of 15000+600000
- 14271 words of font info for 63 fonts, out of 8000000 for 9000
+ 4902 multiletter control sequences out of 15000+600000
+ 15132 words of font info for 68 fonts, out of 8000000 for 9000
  934 hyphenation exceptions out of 8191
- 25i,6n,21p,1080b,328s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 25i,6n,21p,1080b,428s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on report.dvi (20 pages, 39600 bytes).
+Output written on report.dvi (20 pages, 41764 bytes).
