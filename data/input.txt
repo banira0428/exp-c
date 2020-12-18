@@ -1,6 +1,8 @@
 %C
-%R data/sample.csv
+5100046,The Bridge,1845-11-2,14 Seafield Road Longman Inverness,SEN Unit 2.0 Open
 %C
-%W
+%R data/sample.csv
 %P 1
+%C
+%H
 %Q
