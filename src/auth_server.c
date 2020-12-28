@@ -85,8 +85,6 @@ void exec_command_str(char *exec[], char *response) {
     cmd_register(exec[1], exec[2], exec[3], response);
   } else if (!strcmp("Login", exec[0])) {
     cmd_login(exec[1], exec[2], response);
-  } else if (!strcmp("Logout", exec[0])) {
-    cmd_logout(exec[1], response);
   } else {
     sprintf(response, "ServerError Invalid_Request:%s\n", exec[0]);
   }
@@ -94,6 +92,10 @@ void exec_command_str(char *exec[], char *response) {
 }
 
 void cmd_register(char *email, char *password, char *password_confirm, char *response){
+  if(find_user(email) != -1) {
+    sprintf(response, "ServerError Already_Registered\n");
+    return;
+  }
   if(strcmp(password, password_confirm) != 0) {
     sprintf(response, "ServerError Password_Unmatched\n");
     return;
@@ -127,9 +129,26 @@ void generate_token(char *token){
 }
 
 void cmd_login(char *email, char *password,char *response){
+  int user_index = find_user(email);
 
+  if(user_index == -1){
+    sprintf(response, "ServerError User_Not_Found\n");
+    return;
+  }
+  if(strcmp(password, (&user_data_store[user_index])->password) != 0){
+    sprintf(response, "ServerError Password_Is_Incorrected\n");
+    return;
+  }
+
+  sprintf(response, "Success %s\n", (&user_data_store[user_index])->token);
+  return;
 }
 
-void cmd_logout(char *token, char *response){
-
+int find_user(char *email){
+  for(int i = 0; i < user_count; i++){
+    if(!strcmp(email, (&user_data_store[i])->email)){
+      return i;
+    }
+  }
+  return -1;
 }

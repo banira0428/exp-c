@@ -1,6 +1,6 @@
 #include "auth_client.h"
 
-struct user current_user = {"", "", ""};
+char token[LIMIT] = "";
 
 int main() {
   char line[INPUT_MAX + 1];
@@ -22,7 +22,7 @@ void exec_command_str(char *exec[]) {
   } else if (!strcmp("Status", exec[0])) {
     cmd_status();
   } else if (!strcmp("Login", exec[0])) {
-    cmd_login();
+    cmd_login(exec[1], exec[2]);
   } else if (!strcmp("Logout", exec[0])) {
     cmd_logout();
   } else {
@@ -45,26 +45,48 @@ void cmd_register(char *email, char *password, char *password_confirm) {
     fprintf(stderr, "%s %s", result[0], result[1]);
   } else if (!strcmp(result[0], "Success")) {
     printf("Register success!\n");
-
-    strncpy(current_user.email, email, LIMIT);
-    strncpy(current_user.password, password, LIMIT);
-    strncpy(current_user.token, result[1], LIMIT);
+    strncpy(token, result[1], LIMIT);
   }
 }
 
 void cmd_status() {
-  if (!strcmp(current_user.email, "")) {
+  if (!strcmp(token, "")) {
     printf("Status: Guest\n");
   } else {
     printf("Status: Authenticated\n");
-    print_user();
   }
 }
 
-void print_user() {
-  printf("email: %s\n", current_user.email);
+void cmd_login(char *email, char *password) {
+  if(strcmp(token, "") != 0){
+    printf("ClientError Already_Authenticated\n");
+    return;
+  }
+
+  char req[BUF_SIZE] = "";
+  char res[BUF_SIZE] = "";
+
+  sprintf(req, "Login %s %s", email, password);
+  request(req, res);
+
+  char *result[] = {"", ""};
+  split(res, result, ' ', 5);
+
+  if (!strcmp(result[0], "ServerError")) {
+    fprintf(stderr, "%s %s", result[0], result[1]);
+  } else if (!strcmp(result[0], "Success")) {
+    printf("Login success!\n");
+    strncpy(token, result[1], LIMIT);
+  }
 }
 
-void cmd_login() {}
+void cmd_logout() {
 
-void cmd_logout() {}
+  if(!strcmp(token, "")){
+    printf("ClientError Not_Authenticated\n");
+    return;
+  }
+
+  sprintf(token, "");
+  printf("Logout success!\n");
+}
