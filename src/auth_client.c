@@ -33,11 +33,11 @@ void exec_command_str(char *exec[]) {
   return;
 }
 
-void cmd_register(char *email, char *password, char *password_confirm) {
+void cmd_register(char *name, char *password, char *password_confirm) {
   char req[BUF_SIZE] = "";
   char res[BUF_SIZE] = "";
 
-  sprintf(req, "Register %s %s %s", email, password, password_confirm);
+  sprintf(req, "Register %s %s %s", name, password, password_confirm);
   request(req, res);
 
   char *result[] = {"", ""};
@@ -59,7 +59,7 @@ void cmd_status() {
   }
 }
 
-void cmd_login(char *email, char *password) {
+void cmd_login(char *name, char *password) {
   if(strcmp(token, "") != 0){
     printf("ClientError Already_Authenticated\n");
     return;
@@ -68,7 +68,7 @@ void cmd_login(char *email, char *password) {
   char req[BUF_SIZE] = "";
   char res[BUF_SIZE] = "";
 
-  sprintf(req, "Login %s %s", email, password);
+  sprintf(req, "Login %s %s", name, password);
   request(req, res);
 
   char *result[] = {"", ""};
@@ -82,11 +82,11 @@ void cmd_login(char *email, char *password) {
   }
 }
 
-void cmd_edit(char *new_email) {
+void cmd_edit(char *new_name) {
   char req[BUF_SIZE] = "";
   char res[BUF_SIZE] = "";
 
-  sprintf(req, "Edit %s %s", new_email, token);
+  sprintf(req, "Edit %s %s", new_name, token);
   request(req, res);
 
   char *result[] = {"", ""};

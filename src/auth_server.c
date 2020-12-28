@@ -93,9 +93,9 @@ void exec_command_str(char *exec[], char *response) {
   return;
 }
 
-void cmd_register(char *email, char *password, char *password_confirm,
+void cmd_register(char *name, char *password, char *password_confirm,
                   char *response) {
-  if (find_user_by_email(email) != -1) {
+  if (find_user_by_name(name) != -1) {
     sprintf(response, "ServerError Already_Registered\n");
     return;
   }
@@ -104,14 +104,14 @@ void cmd_register(char *email, char *password, char *password_confirm,
     return;
   }
   char token[LIMIT] = "";
-  create_user(email, password, token);
+  create_user(name, password, token);
   sprintf(response, "Success %s", token);
   return;
 }
 
-void create_user(char *email, char *password, char *token) {
+void create_user(char *name, char *password, char *token) {
   struct user *user = &user_data_store[user_count];
-  strncpy(user->email, email, LIMIT);
+  strncpy(user->name, name, LIMIT);
   strncpy(user->password, password, LIMIT);
   generate_token(token);
   strncpy(user->token, token, LIMIT);
@@ -131,8 +131,8 @@ void generate_token(char *token) {
   return;
 }
 
-void cmd_login(char *email, char *password, char *response) {
-  int user_index = find_user_by_email(email);
+void cmd_login(char *name, char *password, char *response) {
+  int user_index = find_user_by_name(name);
 
   if (user_index == -1) {
     sprintf(response, "ServerError User_Not_Found\n");
@@ -147,20 +147,20 @@ void cmd_login(char *email, char *password, char *response) {
   return;
 }
 
-void cmd_edit(char *new_email, char *token, char *response) {
+void cmd_edit(char *new_name, char *token, char *response) {
   int user_index = find_user_by_token(token);
   if (user_index == -1) {
     sprintf(response, "ServerError Invalid_Token\n");
     return;
   }
 
-  strncpy((&user_data_store[user_index])->email, new_email, LIMIT);
-  sprintf(response, "Success %s\n", new_email);
+  strncpy((&user_data_store[user_index])->name, new_name, LIMIT);
+  sprintf(response, "Success %s\n", new_name);
 }
 
-int find_user_by_email(char *email) {
+int find_user_by_name(char *name) {
   for (int i = 0; i < user_count; i++) {
-    if (!strcmp(email, (&user_data_store[i])->email)) {
+    if (!strcmp(name, (&user_data_store[i])->name)) {
       return i;
     }
   }
