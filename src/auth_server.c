@@ -88,7 +88,7 @@ void exec_command_str(char *exec[], char *response) {
   } else if (!strcmp("Edit", exec[0])) {
     cmd_edit(exec[1], exec[2], response);
   } else {
-    sprintf(response, "ServerError Invalid_Request:%s\n", exec[0]);
+    sprintf(response, "ServerError Invalid_Request_Command:%s\n", exec[0]);
   }
   return;
 }
@@ -150,7 +150,7 @@ void cmd_login(char *email, char *password, char *response) {
 void cmd_edit(char *new_email, char *token, char *response) {
   int user_index = find_user_by_token(token);
   if (user_index == -1) {
-    sprintf(response, "ServerError UnAuthorized\n");
+    sprintf(response, "ServerError Invalid_Token\n");
     return;
   }
 
