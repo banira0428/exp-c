@@ -85,68 +85,91 @@ void exec_command_str(char *exec[], char *response) {
     cmd_register(exec[1], exec[2], exec[3], response);
   } else if (!strcmp("Login", exec[0])) {
     cmd_login(exec[1], exec[2], response);
+  } else if (!strcmp("Edit", exec[0])) {
+    cmd_edit(exec[1], exec[2], response);
   } else {
     sprintf(response, "ServerError Invalid_Request:%s\n", exec[0]);
   }
   return;
 }
 
-void cmd_register(char *email, char *password, char *password_confirm, char *response){
-  if(find_user(email) != -1) {
+void cmd_register(char *email, char *password, char *password_confirm,
+                  char *response) {
+  if (find_user_by_email(email) != -1) {
     sprintf(response, "ServerError Already_Registered\n");
     return;
   }
-  if(strcmp(password, password_confirm) != 0) {
+  if (strcmp(password, password_confirm) != 0) {
     sprintf(response, "ServerError Password_Unmatched\n");
     return;
   }
   char token[LIMIT] = "";
   create_user(email, password, token);
-  sprintf(response, "Success %s\n", token);
+  sprintf(response, "Success %s", token);
   return;
 }
 
-void create_user(char *email, char *password, char *token){
+void create_user(char *email, char *password, char *token) {
   struct user *user = &user_data_store[user_count];
   strncpy(user->email, email, LIMIT);
   strncpy(user->password, password, LIMIT);
   generate_token(token);
-  printf("token : %s\n", token);
   strncpy(user->token, token, LIMIT);
   user_count += 1;
   return;
 }
 
-void generate_token(char *token){
-  char candidates[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  srand((unsigned)time( NULL ));
-  for(int i = 0; i < LIMIT ; i++){
-      int index = random() % (sizeof(candidates) - 1);
-      token[i] = candidates[index];
+void generate_token(char *token) {
+  char candidates[] =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  srand((unsigned)time(NULL));
+  for (int i = 0; i < LIMIT; i++) {
+    int index = random() % (sizeof(candidates) - 1);
+    token[i] = candidates[index];
   }
   token[LIMIT - 1] = '\0';
   return;
 }
 
-void cmd_login(char *email, char *password,char *response){
-  int user_index = find_user(email);
+void cmd_login(char *email, char *password, char *response) {
+  int user_index = find_user_by_email(email);
 
-  if(user_index == -1){
+  if (user_index == -1) {
     sprintf(response, "ServerError User_Not_Found\n");
     return;
   }
-  if(strcmp(password, (&user_data_store[user_index])->password) != 0){
+  if (strcmp(password, (&user_data_store[user_index])->password) != 0) {
     sprintf(response, "ServerError Password_Is_Incorrected\n");
     return;
   }
 
-  sprintf(response, "Success %s\n", (&user_data_store[user_index])->token);
+  sprintf(response, "Success %s", (&user_data_store[user_index])->token);
   return;
 }
 
-int find_user(char *email){
-  for(int i = 0; i < user_count; i++){
-    if(!strcmp(email, (&user_data_store[i])->email)){
+void cmd_edit(char *new_email, char *token, char *response) {
+  int user_index = find_user_by_token(token);
+  if (user_index == -1) {
+    sprintf(response, "ServerError UnAuthorized\n");
+    return;
+  }
+
+  strncpy((&user_data_store[user_index])->email, new_email, LIMIT);
+  sprintf(response, "Success %s\n", new_email);
+}
+
+int find_user_by_email(char *email) {
+  for (int i = 0; i < user_count; i++) {
+    if (!strcmp(email, (&user_data_store[i])->email)) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+int find_user_by_token(char *token) {
+  for (int i = 0; i < user_count; i++) {
+    if (!strcmp(token, (&user_data_store[i])->token)) {
       return i;
     }
   }

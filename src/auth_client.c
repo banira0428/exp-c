@@ -23,6 +23,8 @@ void exec_command_str(char *exec[]) {
     cmd_status();
   } else if (!strcmp("Login", exec[0])) {
     cmd_login(exec[1], exec[2]);
+  } else if (!strcmp("Edit", exec[0])) {
+    cmd_edit(exec[1]);
   } else if (!strcmp("Logout", exec[0])) {
     cmd_logout();
   } else {
@@ -80,8 +82,24 @@ void cmd_login(char *email, char *password) {
   }
 }
 
-void cmd_logout() {
+void cmd_edit(char *new_email) {
+  char req[BUF_SIZE] = "";
+  char res[BUF_SIZE] = "";
 
+  sprintf(req, "Edit %s %s", new_email, token);
+  request(req, res);
+
+  char *result[] = {"", ""};
+  split(res, result, ' ', 5);
+
+  if (!strcmp(result[0], "ServerError")) {
+    fprintf(stderr, "%s %s", result[0], result[1]);
+  } else if (!strcmp(result[0], "Success")) {
+    printf("Edit success!\n");
+  }
+}
+
+void cmd_logout() {
   if(!strcmp(token, "")){
     printf("ClientError Not_Authenticated\n");
     return;
