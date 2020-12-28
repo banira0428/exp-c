@@ -1,4 +1,5 @@
 #include "meibo_server.h"
+#include <unistd.h>
 
 void exec_command_str(char *exec[], char *response);
 
@@ -187,7 +188,9 @@ void exec_command_str(char *exec[], char *response) {
   return;
 }
 
-void cmd_check(char *response) { sprintf(response, "%d", profile_data_nitems); }
+void cmd_check(char *response) { 
+  sleep(5);
+  sprintf(response, "%d", profile_data_nitems); }
 
 void cmd_print(int p, char *response) {
   if (p > 0) {
