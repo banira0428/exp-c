@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.2-190131-2.6 (utf8.euc) (TeX Live 2019) (preloaded format=platex 2019.5.23)  5 JAN 2021 23:08
+This is e-pTeX, Version 3.14159265-p3.8.2-190131-2.6 (utf8.euc) (TeX Live 2019) (preloaded format=platex 2019.5.23)  6 JAN 2021 00:03
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -128,36 +128,16 @@ File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 161.
- [5] [6] [7] [8]
+ [5] [6] [7] [8] [9]
 LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 312.
+(Font)              scaled to size 8.64899pt on input line 328.
 LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 312.
+(Font)              scaled to size 8.64899pt on input line 328.
 LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 313.
+(Font)              scaled to size 8.64899pt on input line 329.
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 313.
- [9] [10] [11] [12] [13] [14] [15] [16] [17] [18] [19] [20]
-Overfull \hbox (44.6337pt too wide) in paragraph at lines 814--814
-[]      \OT1/cmtt/m/n/10 void cmd_check(char *response) { sprintf(response, "%d", profile_data_nitems); }[] 
- []
-
-[21]
-Overfull \hbox (39.38374pt too wide) in paragraph at lines 814--814
-[]          \OT1/cmtt/m/n/10 for (i = profile_data_nitems - abs(p); i <= profile_data_nitems - 1; i++) {[] 
- []
-
-
-Overfull \hbox (13.13397pt too wide) in paragraph at lines 814--814
-[]        \OT1/cmtt/m/n/10 sprintf(tmp, "Birth : %04d-%02d-%02d\n", p->create_at.y, p->create_at.m,[] 
- []
-
-[22]
-Overfull \hbox (39.38374pt too wide) in paragraph at lines 814--814
-[]                  \OT1/cmtt/m/n/10 p->create_at.y, p->create_at.m, p->create_at.d, p->place, p->note);[] 
- []
-
-[23] [24] [25] [26] [27] [28] (./report.aux) ) 
+(Font)              scaled to size 8.64899pt on input line 329.
+ [10] [11] [12] [13] [14] [15] [16] [17] [18] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28] [29] [30] [31] (./report.aux) ) 
 Here is how much of TeX's memory you used:
  869 strings out of 493223
  10608 string characters out of 6144415
@@ -167,4 +147,4 @@ Here is how much of TeX's memory you used:
  934 hyphenation exceptions out of 8191
  25i,6n,21p,1080b,328s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on report.dvi (28 pages, 58544 bytes).
+Output written on report.dvi (31 pages, 67900 bytes).
