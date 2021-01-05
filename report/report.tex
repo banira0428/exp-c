@@ -109,6 +109,12 @@ TCP/IP ， UDP/IP で通信を行うクライアントサーバモデルのプ�
 
 \subsection{簡易認証プログラム（クライアント）の作成方針}
 
+今回の実験では，発展課題として簡易的な認証システムを作成した．
+具体的には，ユーザ登録，ログイン，ログアウトなどの基本的な操作が実行できるようになっている．
+また，今回のプログラムでは，トークンを利用した認証を行なっている．
+
+なお，ここでいう「ユーザ」とは，名前，パスワード，トークンをフィールドとして持つ構造体として実装する．
+
 コマンド実現部以外の作成方針に関しては名簿管理プログラムとほぼ同様なので割愛する．
 
 \subsubsection{コマンド実現部}
@@ -116,6 +122,8 @@ TCP/IP ， UDP/IP で通信を行うクライアントサーバモデルのプ�
 今回のプログラムでは{\tt Register, Status, Edit, Login, Logout}の5つのコマンドを実装した．これらのコマンドの詳しい動作については後述する．
 
 \subsection{簡易認証プログラム（サーバ）の作成方針}
+
+サーバ側の主な役目は，トークン発行及び会員の管理である．
 
 コマンド実現部以外の作成方針に関しては名簿管理プログラムとほぼ同様なので割愛する．
 
@@ -189,6 +197,72 @@ TCP/IP ， UDP/IP で通信を行うクライアントサーバモデルのプ�
       \item Pコマンドが呼び出された場合，保存されている名簿データを与えられた引数の数によって絞り込み（上限，順序等），絞り込んだ結果をコンソール表示用のテキストにフォーマットしてクライアント側への応答として返す．
       \item Hコマンドが呼び出された場合，リクエスト解析部で保存しておいた入力履歴の内容をクライアント側への応答として返す．
 \end{itemize}
+
+\subsection{簡易認証プログラム（クライアント）の説明}
+
+ここでは，簡易認証プログラムのクライアントサイドのコマンド実現部について詳しく解説する．
+（通信部分や入力の解析部は名簿管理プログラムとほぼ同様なので割愛する．）
+また，該当部分のソースコードは，\ref{sec:auth_commands_client.c}節に添付する．
+
+\begin{itemize}
+  \item コマンド名：Register
+  \item 用途：新規ユーザ作成
+  \item 引数：ユーザ名，パスワード，確認用パスワード
+  \item 返り値（認証に成功した場合）：サーバから付与されたトークン（ランダムな文字列）
+  \item 返り値（認証に失敗した場合）：サーバ側で発行されたエラーメッセージ
+  \item 実行例： {\tt Register keita password password}
+\end{itemize}
+
+Register コマンドでは，必要な情報を引数として入力し，ユーザ登録を行う．
+サーバ側で入力された情報が問題ないと判断された場合，返り値としてサーバ側から付与されたトークンをグローバル変数として保持する．（認証済みの状態になる）
+
+\begin{itemize}
+  \item コマンド名：Login
+  \item 用途：ユーザログイン
+  \item 引数：ユーザ名，パスワード
+  \item 返り値：（認証に成功した場合）ユーザの持っているトークン
+  \item 返り値（認証に失敗した場合）：サーバ側で発行されたエラーメッセージ
+  \item 例外：{\tt Already\_Authenticated }（認証済みの状態でログインコマンドを入力した場合）
+  \item 実行例：{\tt Login keita password}
+\end{itemize}
+
+Login コマンドでは，既に会員登録を済ませたユーザ情報がサーバ内に存在するときに，その情報を用いて認証を行う．
+サーバ側で問題なく認証ができた場合，会員登録時同様返り値としてサーバ側から付与されたトークンをグローバル変数として保持する．
+
+\begin{itemize}
+  \item コマンド名：Edit
+  \item 用途：ユーザ名編集（上書き）
+  \item 引数：ユーザ名
+  \item 返り値：（編集に成功した場合）成功を示すメッセージ
+  \item 返り値（編集に失敗した場合）：サーバ側で発行されたエラーメッセージ
+  \item 実行例：{\tt Edit yamada}
+\end{itemize}
+
+Edit コマンドは，クライアントがログイン中の時のみ有効なコマンドであり，
+サーバ上で保持されているユーザ情報の内，ユーザ名を上書きする．ここでユーザの名前を更新すると，
+次回以降のログインの際に入力する内容を変更する必要がある．
+
+\begin{itemize}
+  \item コマンド名：Status
+  \item 用途：認証状態の確認
+  \item 引数：無し
+  \item 返り値：{\tt Authenticated}（認証済み）または{\tt Guest}（未認証）
+  \item 実行例：{\tt Status}
+\end{itemize}
+
+Status コマンドでは，クライアント側のプログラムが現在ログイン中かどうかを確認することが可能である．
+具体的には，トークンを保持しているかどうかで認証状態を判断している．このコマンドは主にデバッグ用として作成した．
+
+\begin{itemize}
+  \item コマンド名：Logout
+  \item 用途：ログアウト
+  \item 引数：無し
+  \item 返り値：成功を示すメッセージ
+  \item 例外：{\tt Not\_Authenticated }（未認証の状態でログアウトコマンドを入力した場合）
+  \item 実行例：{\tt Logout}
+\end{itemize}
+
+Logout コマンドでは，現在保持しているトークンを破棄し，未認証の状態へと変化させる．
 
 \section{プログラムの使用法}
 
@@ -700,5 +774,84 @@ void cmd_history() {
       }
 \end{verbatim}
 
+\subsection{簡易認証プログラムのコマンド処理部（クライアント）} \label{sec:auth_commands_client.c}
+
+\begin{verbatim}
+  void cmd_register(char *name, char *password, char *password_confirm) {
+    char req[BUF_SIZE] = "";
+    char res[BUF_SIZE] = "";
+  
+    sprintf(req, "Register %s %s %s", name, password, password_confirm);
+    request(req, res);
+  
+    char *result[] = {"", ""};
+    split(res, result, ' ', 5);
+  
+    if (!strcmp(result[0], "ServerError")) {
+      fprintf(stderr, "%s %s", result[0], result[1]);
+    } else if (!strcmp(result[0], "Success")) {
+      printf("Register success!\n");
+      strncpy(token, result[1], LIMIT);
+    }
+  }
+  
+  void cmd_status() {
+    if (!strcmp(token, "")) {
+      printf("Status: Guest\n");
+    } else {
+      printf("Status: Authenticated\n");
+    }
+  }
+  
+  void cmd_login(char *name, char *password) {
+    if(strcmp(token, "") != 0){
+      printf("ClientError Already_Authenticated\n");
+      return;
+    }
+  
+    char req[BUF_SIZE] = "";
+    char res[BUF_SIZE] = "";
+  
+    sprintf(req, "Login %s %s", name, password);
+    request(req, res);
+  
+    char *result[] = {"", ""};
+    split(res, result, ' ', 5);
+  
+    if (!strcmp(result[0], "ServerError")) {
+      fprintf(stderr, "%s %s", result[0], result[1]);
+    } else if (!strcmp(result[0], "Success")) {
+      printf("Login success!\n");
+      strncpy(token, result[1], LIMIT);
+    }
+  }
+  
+  void cmd_edit(char *new_name) {
+    char req[BUF_SIZE] = "";
+    char res[BUF_SIZE] = "";
+  
+    sprintf(req, "Edit %s %s", new_name, token);
+    request(req, res);
+  
+    char *result[] = {"", ""};
+    split(res, result, ' ', 5);
+  
+    if (!strcmp(result[0], "ServerError")) {
+      fprintf(stderr, "%s %s", result[0], result[1]);
+    } else if (!strcmp(result[0], "Success")) {
+      printf("Edit success!\n");
+    }
+  }
+  
+  void cmd_logout() {
+    if(!strcmp(token, "")){
+      printf("ClientError Not_Authenticated\n");
+      return;
+    }
+  
+    sprintf(token, "");
+    printf("Logout success!\n");
+  }
+\end{verbatim}
 
 \end{document}
