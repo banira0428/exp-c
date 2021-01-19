@@ -25,9 +25,16 @@ server:
 ser: 
 	out/meibo_server.out
 
+meibo: 
+	make client
+	make server
+	out/meibo_server.out &
+	out/meibo_client.out
+
 auth:
 	gcc-10 -o out/auth_server.out src/auth_server.c src/process_line.c
 	gcc-10 -o out/auth_client.out src/auth_client.c src/process_line.c src/client.c
-
+	out/auth_server.out &
+	out/auth_client.out
 
 

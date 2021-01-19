@@ -2,6 +2,14 @@
 #include <unistd.h>
 
 void exec_command_str(char *exec[], char *response);
+void make_profile_shadow(struct profile data_store[], struct profile *shadow[],
+                         int size);
+void parse_line(char *line, char *response);
+void cmd_check(char *response);
+void print_profile(int index, char *response);
+void cmd_write(char *response);
+void cmd_history(char *response);
+int strtoi(char *param, char **error);
 
 int profile_data_nitems = 0; /* 現在のデータ数 */
 struct profile profile_data_store[MAX_PROFILES];

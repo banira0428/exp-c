@@ -14,3 +14,13 @@
 #define RESPONSE_BUF_SIZE 1048576
 #define MAX_USERS 1000
 
+void parse_line(char *line, char *response);
+void exec_command_str(char *exec[], char *response);
+void cmd_register(char *name, char *password, char *password_confirm,
+                  char *response);
+void create_user(char *name, char *password, char *token);
+void generate_token(char *token);
+void cmd_login(char *name, char *password, char *response);
+void cmd_edit(char *new_name, char *token, char *response);
+int find_user_by_name(char *name);
+int find_user_by_token(char *token);
